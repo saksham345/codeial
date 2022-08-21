@@ -1,7 +1,7 @@
 const User = require('../models/user');
 
 module.exports.profile = function(req, res){
-    return res.render('./user_profile.ejs',{
+    return res.render('user_profile.ejs',{
         title: "Profile"
     });
 }
@@ -32,10 +32,12 @@ module.exports.create = function(req, res){
                 return res.redirect('/users/sign-in');
             })
         }
-        else return res.redirect('back'); 
-    })
+        else {
+            return res.redirect('back'); 
+        }
+    });
 }
 
 module.exports.createSession = function(req, res){
-    //TODOLATER
+    return res.redirect('/');
 }
