@@ -1,5 +1,6 @@
 <h1><%= title %></h1>
 <section id="feed-posts">
+    <% if(locals.user) { %>
     <h4>Posts</h4>
     <form action="/posts/create" id="newpost-form" method="post">
         <textarea name="content" cols="30" rows="5" placeholder="Type Here..."></textarea>
@@ -21,4 +22,5 @@
             <% } %>
         </ul>
     </div>
+    <% } %>
 </section>
