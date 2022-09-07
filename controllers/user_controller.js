@@ -43,7 +43,8 @@ module.exports.signIn = function(req, res){
 //get sign up data
 module.exports.create = function(req, res){
     if(req.body.password != req.body.confirm_password){
-        return res.redirect('back');
+        req.flash('error', 'Confirm password not matching');
+        return res.redirect('/users/sign-up');
     }
     User.findOne({email: req.body.email}, function(err, user){
         if(err) { console.log('error in finding user in signing up'); return}
