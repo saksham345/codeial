@@ -1,6 +1,9 @@
 const User = require('../models/user');
 const fs = require('fs');
 const path = require('path');
+const queue = require('../config/kue');
+const usersMailer = require('../mailers/users_mailer');
+const userEmailWorker = require('../workers/user_email_worker');
 
 module.exports.profile = function(req, res){
     User.findById(req.params.id, function(err, user){
@@ -78,13 +81,20 @@ module.exports.create = function(req, res){
         if(!user){
             User.create(req.body, function(err, user){
                 if(err) { console.log('error while signing up'); return}
-            
+                let job = queue.create('signup-success', user).save(function(err){
+                    if(err){
+                        console.log('Error in sending to queue', err);
+                        return;
+                    }
+                    console.group('Job enqueued', job.id);
+                })
+                req.flash('success', 'Sign up completed');
                 return res.redirect('/users/sign-in');
             })
         }
         else {
-            req.flash('success', 'User successfully signed');
-            return res.redirect('back'); 
+            req.flash('error', 'Email already exists');
+            return res.redirect('back');
         }
     });
 }
