@@ -5,16 +5,37 @@ const queue = require('../config/kue');
 const usersMailer = require('../mailers/users_mailer');
 const userEmailWorker = require('../workers/user_email_worker');
 const crypto = require('crypto');
+const Friendship = require('../models/friendship');
 
 module.exports.profile = function(req, res){
     User.findById(req.params.id, function(err, user){
+
+        let are_friends = false;
+
+        Friendship.findOne({
+            $or: [{ from_user: req.user._id, to_user: req.params.id },
+            { from_user: req.params.id, to_user: req.user._id }]
+        }, function (error, friendship)
+        {
+            if (error)
+            {
+                console.log('There was an error in finding the friendship', error);
+                return;
+            }
+            if (friendship)
+            {
+                are_friends = true;
+            }
         return res.render('user_profile.ejs',{
             title: "Profile",
-            profile_user: user
+            profile_user: user,
+            are_friends: are_friends
         });
+    });
 
     });
 }
+
 
 module.exports.update = async function(req, res){
     if(req.user.id == req.params.id){
